@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Professionals Property Plus Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme: dark;
+  --bg-0:#070B14;
+  --bg-1:#0C1322;
+  --bg-2:#141821;
+  --red:#EE4751;
+  --red-soft:rgba(238,71,81,.16);
+  --red-glow:rgba(238,71,81,.55);
+  --ink:#EEF1F6;
+  --ink-2:#B9C1CF;
+  --muted:#7E889A;
+  --glass:rgba(255,255,255,.035);
+  --glass-2:rgba(255,255,255,.06);
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.14);
+  --good:#4FD1A5;
+  --display:"Sora", "Segoe UI", system-ui, sans-serif;
+  --body:"Manrope", "Segoe UI", system-ui, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--bg-0)}
+body{
+  margin:0; min-height:100%;
+  background:
+    radial-gradient(1100px 600px at 12% -10%, rgba(238,71,81,.10), transparent 60%),
+    radial-gradient(900px 700px at 100% 0%, rgba(64,96,170,.16), transparent 60%),
+    linear-gradient(180deg, var(--bg-1) 0%, var(--bg-0) 55%, var(--bg-2) 100%);
+  background-attachment: fixed;
+  color:var(--ink); font-family:var(--body); font-size:15px; line-height:1.55;
+  padding-inline:16px;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{ /* subtle noise */
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.07; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+.wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding-block:28px 48px; display:flex; flex-direction:column; gap:28px}
+
+/* ---------- glass ---------- */
+.glass{
+  background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02));
+  border:1px solid var(--line);
+  border-radius:20px;
+  backdrop-filter:blur(18px) saturate(140%);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 20px 50px -20px rgba(0,0,0,.6);
+}
+
+/* ---------- header ---------- */
+.header{position:relative; overflow:hidden; padding:28px 32px 30px; display:grid; grid-template-columns:1fr auto; gap:24px 32px; align-items:start}
+.header::after{ /* soft glow */
+  content:""; position:absolute; width:520px; height:520px; right:-160px; top:-300px; border-radius:50%;
+  background:radial-gradient(circle, rgba(238,71,81,.22), transparent 65%); pointer-events:none;
+}
+.brand{display:flex; align-items:center; gap:14px}
+.brand svg{width:40px; height:40px; flex:none; filter:drop-shadow(0 0 8px var(--red-glow))}
+.brand-name{display:flex; flex-direction:column; line-height:1.1}
+.brand-name b{font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:.28em}
+.brand-name span{font-family:var(--display); font-weight:500; font-size:11px; letter-spacing:.42em; color:var(--red); margin-top:4px}
+.h1{font-family:var(--display); font-weight:600; font-size:clamp(26px, 3.6vw, 40px); line-height:1.12; letter-spacing:-.02em; margin:26px 0 14px; text-wrap:balance}
+.meta{display:flex; flex-wrap:wrap; gap:10px 22px; color:var(--ink-2); font-size:14px}
+.meta span, .meta a{display:inline-flex; align-items:center; gap:8px; color:inherit; text-decoration:none}
+.meta a:hover{color:var(--ink)}
+.meta a:focus-visible{outline:2px solid var(--red); outline-offset:3px; border-radius:4px}
+.ico{width:16px; height:16px; flex:none; color:var(--red); filter:drop-shadow(0 0 4px var(--red-glow))}
+.tr{text-align:right; position:relative; z-index:1}
+.tr .label{display:inline-flex; align-items:center; gap:8px; font-family:var(--display); font-size:13px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
+  padding:8px 14px; border-radius:999px; border:1px solid rgba(238,71,81,.35); background:var(--red-soft); color:#FFD9DC}
+.tr .label i{width:7px; height:7px; border-radius:50%; background:var(--red); box-shadow:0 0 10px var(--red)}
+.tr .range{margin-top:12px; font-family:var(--mono); font-size:12.5px; color:var(--ink-2); letter-spacing:.02em; font-variant-numeric:tabular-nums}
+.tr .range small{display:block; color:var(--muted); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; font-family:var(--body); font-weight:600}
+
+/* ---------- section heads ---------- */
+.sec-head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap}
+.sec-head h2{font-family:var(--display); font-weight:600; font-size:21px; letter-spacing:-.01em; margin:0}
+.sec-head p{margin:4px 0 0; color:var(--muted); font-size:13.5px}
+.chip{font-family:var(--mono); font-size:12px; color:var(--ink-2); padding:6px 12px; border-radius:999px; border:1px solid var(--line-2); background:var(--glass); font-variant-numeric:tabular-nums; white-space:nowrap}
+
+/* ---------- KPI ---------- */
+.kpis{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px}
+.kpi{position:relative; overflow:hidden; padding:22px 22px 20px; display:flex; flex-direction:column; gap:10px; transition:transform .35s ease, border-color .35s ease}
+.kpi:hover{transform:translateY(-3px); border-color:rgba(238,71,81,.35)}
+.kpi::before{ /* top reflection */
+  content:""; position:absolute; inset:0 0 auto 0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+}
+.kpi-top{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.kpi-label{font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2)}
+.kpi-ic{width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--red-soft); border:1px solid rgba(238,71,81,.25)}
+.kpi-ic svg{width:17px; height:17px; color:#FF8A91}
+.kpi-val{font-family:var(--display); font-weight:600; font-size:40px; letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums}
+.kpi-val sup{font-size:.45em; font-weight:500; color:var(--ink-2); margin-left:2px; vertical-align:.9em}
+.kpi-sub{color:var(--muted); font-size:13px}
+.kpi-sub b{color:var(--ink-2); font-weight:600}
+.bar{height:6px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden}
+.bar i{display:block; height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg, #B8323B, var(--red) 70%, #FF9EA4); box-shadow:0 0 12px var(--red-glow); transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.kpi.feature{background:linear-gradient(160deg, rgba(238,71,81,.16), rgba(255,255,255,.02) 60%)}
+.kpi.feature::after{content:""; position:absolute; right:-60px; bottom:-60px; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle, rgba(238,71,81,.25), transparent 70%); pointer-events:none}
+
+/* ---------- insights ---------- */
+.insights{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:16px}
+.ins{grid-column:span 2; padding:22px; display:flex; flex-direction:column; gap:12px}
+.ins.wide{grid-column:span 3}
+.ins-top{display:flex; align-items:center; gap:12px}
+.ins-ic{width:38px; height:38px; flex:none; border-radius:12px; display:grid; place-items:center; background:linear-gradient(180deg, rgba(238,71,81,.22), rgba(238,71,81,.08)); border:1px solid rgba(238,71,81,.3)}
+.ins-ic svg{width:18px; height:18px; color:#FFB3B8}
+.ins h3{font-family:var(--display); font-size:16px; font-weight:600; margin:0; letter-spacing:-.005em; line-height:1.3}
+.ins p{margin:0; color:var(--ink-2); font-size:14px; max-width:62ch}
+.ins .tag{margin-top:auto; align-self:flex-start; font-family:var(--mono); font-size:11.5px; color:#FFD3D6; padding:5px 10px; border-radius:8px; background:var(--red-soft); border:1px solid rgba(238,71,81,.25); font-variant-numeric:tabular-nums}
+
+.foot{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:12.5px; padding-top:8px; border-top:1px solid var(--line)}
+.btn{font:600 12.5px var(--body); letter-spacing:.06em; color:var(--ink-2); background:var(--glass); border:1px solid var(--line-2); border-radius:999px; padding:8px 14px; cursor:pointer; display:inline-flex; gap:8px; align-items:center}
+.btn:hover{color:var(--ink); border-color:rgba(238,71,81,.45)}
+.btn:focus-visible{outline:2px solid var(--red); outline-offset:2px}
+.btn svg{width:14px; height:14px}
+
+/* reveal after intro (visible at rest by default) */
+.rv{transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1)}
+body.pre .rv{opacity:0; transform:translateY(14px)}
+
+/* ---------- INTRO ---------- */
+#intro{position:fixed; inset:0; z-index:50; display:grid; place-items:center; overflow:hidden;
+  background:radial-gradient(900px 600px at 50% 55%, #121A2C 0%, #080C16 60%, #05070D 100%);
+  transition:opacity .6s ease, visibility .6s;}
+#intro.done{opacity:0; visibility:hidden}
+#intro .bright{position:absolute; inset:0; background:radial-gradient(600px 420px at 50% 55%, rgba(238,71,81,.20), rgba(90,120,200,.10) 45%, transparent 70%); opacity:0}
+#intro canvas{position:absolute; inset:0; width:100%; height:100%}
+.stage{position:relative; width:min(640px, 92vw); aspect-ratio:3/2; max-width:100%}
+.stage svg.house{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+.house .glow{stroke:var(--red); stroke-width:10; opacity:.35; filter:blur(8px)}
+.house .main{stroke:url(#hg); stroke-width:2.6}
+.house .pulse{stroke:#fff; stroke-width:3; opacity:0; filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 14px var(--red))}
+.house path{fill:none; stroke-linecap:round; stroke-linejoin:round}
+.i-logo{position:absolute; left:50%; top:60%; transform:translate(-50%,-50%) scale(.8); opacity:0; display:flex; flex-direction:column; align-items:center; gap:10px; overflow:hidden; padding:6px 10px}
+.i-logo svg{width:clamp(44px, 9vw, 62px); height:auto; filter:drop-shadow(0 0 12px var(--red-glow))}
+.i-word{text-align:center; line-height:1.15}
+.i-word b{display:block; font-family:var(--display); font-weight:700; font-size:clamp(13px, 2.6vw, 19px); letter-spacing:.3em; padding-left:.3em; color:#fff; text-shadow:0 0 18px rgba(255,255,255,.25)}
+.i-word span{display:block; font-family:var(--display); font-weight:500; font-size:clamp(9px, 1.7vw, 12px); letter-spacing:.5em; padding-left:.5em; color:var(--red); margin-top:6px}
+.sweep{position:absolute; top:-20%; bottom:-20%; width:40%; left:-60%; transform:skewX(-20deg); pointer-events:none;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); mix-blend-mode:overlay; opacity:0}
+.i-tag{position:absolute; left:0; right:0; top:92%; text-align:center; font-family:var(--body); font-size:clamp(10px, 1.8vw, 12px); font-weight:600; letter-spacing:.42em; text-transform:uppercase; color:var(--ink-2); opacity:0}
+.reflect{position:absolute; left:15%; right:15%; top:84%; height:40px; background:radial-gradient(ellipse at 50% 0%, rgba(238,71,81,.28), transparent 70%); filter:blur(6px); opacity:0}
+
+#intro.play .bright{animation:bright 1s ease 1s forwards}
+#intro.play .main, #intro.play .glow{animation:draw 1s cubic-bezier(.65,.05,.36,1) forwards}
+#intro.play .pulse{animation:pulse 1s ease-in-out 1s forwards}
+#intro.play .house{animation:dim .8s ease 2.1s forwards}
+#intro.play .i-logo{animation:pop .9s cubic-bezier(.34,1.56,.64,1) 2s forwards}
+#intro.play .sweep{animation:sweep .9s ease-in-out 3.05s forwards}
+#intro.play .i-tag{animation:fade .7s ease 3.2s forwards}
+#intro.play .reflect{animation:fade 1s ease 1.2s forwards}
+@keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+@keyframes pulse{0%{opacity:0; stroke-dashoffset:.12}15%{opacity:1}85%{opacity:1}100%{opacity:0; stroke-dashoffset:-1}}
+@keyframes bright{to{opacity:1}}
+@keyframes dim{to{opacity:.42}}
+@keyframes pop{0%{opacity:0; transform:translate(-50%,-50%) scale(.8); filter:blur(6px)}60%{opacity:1; filter:blur(0)}100%{opacity:1; transform:translate(-50%,-50%) scale(1)}}
+@keyframes sweep{0%{left:-60%; opacity:1}100%{left:130%; opacity:1}}
+@keyframes fade{to{opacity:1}}
+
+@media (max-width: 900px){
+  .kpis{grid-template-columns:repeat(2, minmax(0,1fr))}
+  .insights{grid-template-columns:1fr 1fr}
+  .ins, .ins.wide{grid-column:span 1}
+  .ins:last-child{grid-column:span 2}
+}
+@media (max-width: 620px){
+  .header{grid-template-columns:1fr; padding:22px 20px 24px}
+  .tr{text-align:left; grid-row:1}
+  .kpis, .insights{grid-template-columns:1fr}
+  .ins:last-child{grid-column:auto}
+  .kpi-val{font-size:34px}
+}
+@media (prefers-reduced-motion: reduce){
+  #intro{display:none}
+  .rv, .bar i, .kpi{transition:none}
+}
+</style>
+</head>
+<body>
+
+
+<!-- ============ INTRO ============ -->
+<div id="intro" aria-hidden="true">
+  <div class="bright"></div>
+  <canvas id="fx"></canvas>
+  <div class="stage">
+    <svg class="house" id="houseSvg" viewBox="0 0 600 400">
+      <defs>
+        <linearGradient id="hg" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stop-color="#FF6B74"/>
+          <stop offset=".5" stop-color="#FFE4E6"/>
+          <stop offset="1" stop-color="#EE4751"/>
+        </linearGradient>
+      </defs>
+      <path class="glow" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" d="M40 330 H150 V190 L300 72 L450 190 V330 H560"/>
+      <path class="main" id="housePath" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1" d="M40 330 H150 V190 L300 72 L450 190 V330 H560"/>
+      <path class="pulse" pathLength="1" stroke-dasharray=".12 1.2" stroke-dashoffset=".12" d="M40 330 H150 V190 L300 72 L450 190 V330 H560"/>
+    </svg>
+    <div class="reflect"></div>
+    <div class="i-logo">
+      <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#EE4751" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"><path d="M22 12 H56 A26 26 0 0 1 56 64 H46"/><path d="M22 12 V72 L46 88 V26 Z"/></g></svg>
+      <div class="i-word"><b>PROFESSIONALS</b><span>PROPERTY PLUS</span></div>
+      <div class="sweep"></div>
+    </div>
+    <div class="i-tag">Weekly Campaign Performance</div>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div class="wrap">
+
+  <header class="glass header rv">
+    <div>
+      <div class="brand">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#EE4751" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"><path d="M22 12 H56 A26 26 0 0 1 56 64 H46"/><path d="M22 12 V72 L46 88 V26 Z"/></g></svg>
+        <div class="brand-name"><b>PROFESSIONALS</b><span>PROPERTY PLUS</span></div>
+      </div>
+      <h1 class="h1">Weekly Campaign Performance Report</h1>
+      <div class="meta">
+        <span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.2-3.6 4-5.4 7.5-5.4s6.3 1.8 7.5 5.4"/></svg>Tracey Mayze</span>
+        <a href="https://www.ppre.net/" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></svg>ppre.net</a>
+        <span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span id="today">—</span></span>
+      </div>
+    </div>
+    <div class="tr">
+      <div class="label"><i></i>Client Report</div>
+      <div class="range"><small>Reporting week</small><span id="weekRange">—</span></div>
+    </div>
+  </header>
+
+  <section class="rv" style="display:flex; flex-direction:column; gap:16px" aria-labelledby="kpiH">
+    <div class="sec-head">
+      <div><h2 id="kpiH">Current Week Performance</h2><p>Outbound calling results for the reporting week</p></div>
+      <span class="chip" id="weekChip">—</span>
+    </div>
+    <div class="kpis">
+      <article class="glass kpi feature">
+        <div class="kpi-top"><span class="kpi-label">Total Calls Taken</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3.5l1.8 4.4-2.2 1.4a11 11 0 0 0 6.1 6.1l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></svg></span></div>
+        <div class="kpi-val" data-count="953" data-dec="0">0</div>
+        <div class="kpi-sub">Dials completed across the campaign</div>
+      </article>
+      <article class="glass kpi">
+        <div class="kpi-top"><span class="kpi-label">Calls Connected</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h5l2-4 2 8 2-4h5"/></svg></span></div>
+        <div class="kpi-val" data-count="415" data-dec="0">0</div>
+        <div class="kpi-sub"><b>415</b> live conversations with prospects</div>
+      </article>
+      <article class="glass kpi">
+        <div class="kpi-top"><span class="kpi-label">Connected Calls %</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 7.6 10.5L12 12z"/></svg></span></div>
+        <div class="kpi-val" data-count="43.55" data-dec="2" data-suf="%">0</div>
+        <div class="bar"><i data-w="43.55"></i></div>
+        <div class="kpi-sub"><b>415</b> of 953 calls connected</div>
+      </article>
+      <article class="glass kpi">
+        <div class="kpi-top"><span class="kpi-label">Total Callbacks</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/></svg></span></div>
+        <div class="kpi-val" data-count="3" data-dec="0">0</div>
+        <div class="kpi-sub">Prospects who asked to be called back</div>
+      </article>
+      <article class="glass kpi">
+        <div class="kpi-top"><span class="kpi-label">Appointments Set</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg></span></div>
+        <div class="kpi-val" data-count="3" data-dec="0">0</div>
+        <div class="kpi-sub">Confirmed meetings for the team</div>
+      </article>
+      <article class="glass kpi">
+        <div class="kpi-top"><span class="kpi-label">Appointment %</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span></div>
+        <div class="kpi-val" data-count="0.72" data-dec="2" data-suf="%">0</div>
+        <div class="kpi-sub"><b>3</b> appointments from 415 connected calls</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="rv" style="display:flex; flex-direction:column; gap:16px" aria-labelledby="insH">
+    <div class="sec-head">
+      <div><h2 id="insH">Campaign Performance Insights</h2><p>Prepared for management and client review</p></div>
+    </div>
+    <div class="insights">
+      <article class="glass ins wide">
+        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V11M10 19V6M16 19v-9M22 19H2"/></svg></span><h3>Consistent, high-volume outreach</h3></div>
+        <p>The team completed 953 calls this week, keeping a steady and disciplined calling rhythm from Monday to Friday. This level of activity keeps Professionals Property Plus visible to a wide base of homeowners and prospects.</p>
+        <span class="tag">953 calls</span>
+      </article>
+      <article class="glass ins wide">
+        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v10H8l-4 4z"/><path d="M8 10h8M8 13h5"/></svg></span><h3>Strong connection rate</h3></div>
+        <p>More than four in every ten calls reached a live person. 415 real conversations give the campaign a healthy base of engaged contacts and useful market feedback to build on.</p>
+        <span class="tag">43.55% connected</span>
+      </article>
+      <article class="glass ins">
+        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg></span><h3>Appointments secured</h3></div>
+        <p>Three appointments were confirmed this week. Each one is a direct opportunity for the Professionals team to meet a motivated prospect in person.</p>
+        <span class="tag">3 appointments</span>
+      </article>
+      <article class="glass ins">
+        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4M12 8v4l3 2"/></svg></span><h3>A warm pipeline is forming</h3></div>
+        <p>Three prospects asked to be called back. These contacts have already shown interest, which sets up promising follow-up conversations next week.</p>
+        <span class="tag">3 callbacks</span>
+      </article>
+      <article class="glass ins">
+        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><h3>Growing brand presence</h3></div>
+        <p>Every conversation introduces the brand to local homeowners. The insights gathered this week will guide calling times and list focus as the campaign continues.</p>
+        <span class="tag">415 conversations</span>
+      </article>
+    </div>
+  </section>
+
+  <footer class="foot rv">
+    <span>Professionals Property Plus · Client Report · <span id="footRange">—</span></span>
+    <button class="btn" id="replay" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/></svg>Replay intro</button>
+  </footer>
+</div>
+
+<script>
+(function(){
+  /* ---------- live dates ---------- */
+  const now = new Date();
+  const full = now.toLocaleDateString('en-AU', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
+  const f = d => d.toLocaleDateString('en-AU', {weekday:'short', day:'numeric', month:'short'});
+  const range = f(mon) + ' – ' + f(fri) + ' ' + fri.getFullYear();
+  document.getElementById('today').textContent = full;
+  document.getElementById('weekRange').textContent = range;
+  document.getElementById('weekChip').textContent = range;
+  document.getElementById('footRange').textContent = range;
+
+  /* ---------- KPI count-up ---------- */
+  function countUp(){
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const target = parseFloat(el.dataset.count), dec = +el.dataset.dec, suf = el.dataset.suf || '';
+      const t0 = performance.now(), dur = 1300;
+      const fmt = v => v.toLocaleString('en-AU', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + (suf ? '<sup>' + suf + '</sup>' : '');
+      (function step(t){
+        const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        el.innerHTML = fmt(target * e);
+        if (p < 1) requestAnimationFrame(step);
+      })(t0);
+    });
+    document.querySelectorAll('.bar i').forEach(b => { b.style.width = '0'; requestAnimationFrame(() => requestAnimationFrame(() => b.style.width = b.dataset.w + '%')); });
+  }
+  function finalValues(){
+    document.querySelectorAll('[data-count]').forEach(el => {
+      const dec = +el.dataset.dec, suf = el.dataset.suf || '';
+      el.innerHTML = parseFloat(el.dataset.count).toLocaleString('en-AU', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + (suf ? '<sup>' + suf + '</sup>' : '');
+    });
+    document.querySelectorAll('.bar i').forEach(b => b.style.width = b.dataset.w + '%');
+  }
+
+  /* ---------- intro ---------- */
+  const intro = document.getElementById('intro');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const cvs = document.getElementById('fx'), ctx = cvs.getContext('2d');
+  const path = document.getElementById('housePath'), svg = document.getElementById('houseSvg');
+  let parts = [], raf = 0, timers = [];
+
+  function size(){ const r = devicePixelRatio || 1; cvs.width = innerWidth * r; cvs.height = innerHeight * r; ctx.setTransform(r,0,0,r,0,0); }
+  const ease = p => p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3) / 2;
+
+  function frame(t0){
+    return function loop(t){
+      const s = (t - t0) / 1000;
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      if (s < 1.02){
+        const len = path.getTotalLength();
+        const pt = path.getPointAtLength(len * ease(Math.min(1, s)));
+        const m = svg.getScreenCTM(); const x = pt.x * m.a + m.e, y = pt.y * m.d + m.f;
+        for (let i = 0; i < 3; i++) parts.push({x, y, vx:(Math.random()-.5)*1.4, vy:(Math.random()-.5)*1.4 - .2, life:1, r:Math.random()*1.8+.6, w:Math.random() < .35});
+        const g = ctx.createRadialGradient(x, y, 0, x, y, 26);
+        g.addColorStop(0, 'rgba(255,255,255,.95)'); g.addColorStop(.25, 'rgba(255,120,128,.6)'); g.addColorStop(1, 'rgba(238,71,81,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, 26, 0, 7); ctx.fill();
+      }
+      parts = parts.filter(p => (p.life -= .022) > 0);
+      for (const p of parts){
+        p.x += p.vx; p.y += p.vy; p.vx *= .97; p.vy *= .97;
+        ctx.fillStyle = p.w ? `rgba(255,255,255,${p.life*.9})` : `rgba(255,110,118,${p.life})`;
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r * p.life, 0, 7); ctx.fill();
+      }
+      if (s < 2.2) raf = requestAnimationFrame(loop); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+    };
+  }
+
+  function play(){
+    cancelAnimationFrame(raf); timers.forEach(clearTimeout); timers = []; parts = [];
+    if (reduce){ finalValues(); return; }
+    document.body.classList.add('pre');
+    intro.classList.remove('done', 'play'); void intro.offsetWidth;
+    size(); intro.classList.add('play');
+    raf = requestAnimationFrame(t => requestAnimationFrame(frame(t)));
+    timers.push(setTimeout(() => {
+      intro.classList.add('done');
+      document.body.classList.remove('pre');
+      countUp();
+    }, 4000));
+  }
+  addEventListener('resize', size);
+  document.getElementById('replay').addEventListener('click', () => { scrollTo({top:0}); play(); });
+  play();
+})();
+</script>
+
+</body>
+</html>
