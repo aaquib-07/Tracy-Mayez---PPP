@@ -16,6 +16,9 @@
   --red:#EE4751;
   --red-soft:rgba(238,71,81,.16);
   --red-glow:rgba(238,71,81,.55);
+  --blue:#7FA0E8;
+  --blue-soft:rgba(127,160,232,.14);
+  --blue-glow:rgba(127,160,232,.5);
   --ink:#EEF1F6;
   --ink-2:#B9C1CF;
   --muted:#7E889A;
@@ -40,11 +43,29 @@ body{
   color:var(--ink); font-family:var(--body); font-size:15px; line-height:1.55;
   padding-inline:16px;
   -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
 }
 body::before{ /* subtle noise */
   content:""; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.07; mix-blend-mode:overlay;
   background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .9 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
+
+/* ---------- shared live keyframes ---------- */
+@keyframes lineFlow{0%{background-position:200% 0}100%{background-position:0 0}}
+@keyframes edgeRun{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+@keyframes ripple{0%{transform:scale(.5); opacity:.9}100%{transform:scale(1.8); opacity:0}}
+@keyframes dotPulse{0%,100%{transform:scale(1); opacity:1}50%{transform:scale(1.6); opacity:.4}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes barPulse{0%,100%{transform:scaleY(1); opacity:1}50%{transform:scaleY(.55); opacity:.6}}
+
+/* ---------- live background ---------- */
+#bg{position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none}
+.orb{position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(90px)}
+.orb.a{width:460px; height:460px; left:-8%; top:18%; background:rgba(238,71,81,.10); animation:orbA 24s ease-in-out infinite}
+.orb.b{width:520px; height:520px; right:-10%; top:48%; background:rgba(64,96,170,.14); animation:orbB 30s ease-in-out infinite}
+@keyframes orbA{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(70px,-50px) scale(1.15)}}
+@keyframes orbB{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-80px,60px) scale(.88)}}
+
 .wrap{position:relative; z-index:1; max-width:1180px; margin:0 auto; padding-block:28px 48px; display:flex; flex-direction:column; gap:28px}
 
 /* ---------- glass ---------- */
@@ -59,12 +80,24 @@ body::before{ /* subtle noise */
 
 /* ---------- header ---------- */
 .header{position:relative; overflow:hidden; padding:28px 32px 30px; display:grid; grid-template-columns:1fr auto; gap:24px 32px; align-items:start}
-.header::after{ /* soft glow */
+.header::after{ /* soft glow, drifting */
   content:""; position:absolute; width:520px; height:520px; right:-160px; top:-300px; border-radius:50%;
   background:radial-gradient(circle, rgba(238,71,81,.22), transparent 65%); pointer-events:none;
+  animation:glowDrift 14s ease-in-out infinite;
+}
+@keyframes glowDrift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-120px,70px) scale(1.2)}}
+.header::before{ /* flowing line along the bottom edge */
+  content:""; position:absolute; left:0; right:0; bottom:0; height:2px;
+  background:linear-gradient(90deg, transparent 0%, var(--red) 25%, #FFE4E6 50%, var(--red) 75%, transparent 100%);
+  background-size:200% 100%; opacity:.7; animation:lineFlow 6s linear infinite;
 }
 .brand{display:flex; align-items:center; gap:14px}
-.brand svg{width:40px; height:40px; flex:none; filter:drop-shadow(0 0 8px var(--red-glow))}
+.brand svg{width:40px; height:40px; flex:none; filter:drop-shadow(0 0 8px var(--red-glow)); animation:brandFloat 4.5s ease-in-out infinite}
+@keyframes brandFloat{0%,100%{transform:translateY(1px) scale(1)}50%{transform:translateY(-3px) scale(1.05)}}
+/* the logo draws itself once each time the header appears, then stays whole */
+.brand svg path{stroke-dasharray:1}
+.header.in .brand svg path{animation:brandDraw 1.5s ease-out .35s both}
+@keyframes brandDraw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 .brand-name{display:flex; flex-direction:column; line-height:1.1}
 .brand-name b{font-family:var(--display); font-weight:700; font-size:15px; letter-spacing:.28em}
 .brand-name span{font-family:var(--display); font-weight:500; font-size:11px; letter-spacing:.42em; color:var(--red); margin-top:4px}
@@ -73,60 +106,132 @@ body::before{ /* subtle noise */
 .meta span, .meta a{display:inline-flex; align-items:center; gap:8px; color:inherit; text-decoration:none}
 .meta a:hover{color:var(--ink)}
 .meta a:focus-visible{outline:2px solid var(--red); outline-offset:3px; border-radius:4px}
-.ico{width:16px; height:16px; flex:none; color:var(--red); filter:drop-shadow(0 0 4px var(--red-glow))}
+.ico{width:16px; height:16px; flex:none; color:var(--red); filter:drop-shadow(0 0 4px var(--red-glow)); animation:icoBeat 3s ease-in-out infinite}
+.meta > :nth-child(2) .ico{animation-delay:1s}
+.meta > :nth-child(3) .ico{animation-delay:2s}
+@keyframes icoBeat{0%,70%,100%{transform:scale(1)}85%{transform:scale(1.28)}}
 .tr{text-align:right; position:relative; z-index:1}
 .tr .label{display:inline-flex; align-items:center; gap:8px; font-family:var(--display); font-size:13px; font-weight:600; letter-spacing:.2em; text-transform:uppercase;
   padding:8px 14px; border-radius:999px; border:1px solid rgba(238,71,81,.35); background:var(--red-soft); color:#FFD9DC}
-.tr .label i{width:7px; height:7px; border-radius:50%; background:var(--red); box-shadow:0 0 10px var(--red)}
+.tr .label i{position:relative; width:7px; height:7px; border-radius:50%; background:var(--red); box-shadow:0 0 10px var(--red)}
+.tr .label i::after{content:""; position:absolute; inset:-4px; border-radius:50%; border:1.5px solid var(--red); animation:ripple 1.8s ease-out infinite}
 .tr .range{margin-top:12px; font-family:var(--mono); font-size:12.5px; color:var(--ink-2); letter-spacing:.02em; font-variant-numeric:tabular-nums}
 .tr .range small{display:block; color:var(--muted); font-size:11px; letter-spacing:.14em; text-transform:uppercase; margin-bottom:3px; font-family:var(--body); font-weight:600}
+.tr .clock{margin-top:10px; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12.5px; color:var(--ink); font-variant-numeric:tabular-nums}
+.tr .clock i{position:relative; width:7px; height:7px; border-radius:50%; background:var(--good); flex:none}
+.tr .clock i::after{content:""; position:absolute; inset:-4px; border-radius:50%; border:1.5px solid var(--good); animation:ripple 1.8s ease-out infinite}
 
 /* ---------- section heads ---------- */
+.sec{display:flex; flex-direction:column; gap:16px}
 .sec-head{display:flex; align-items:flex-end; justify-content:space-between; gap:12px 20px; flex-wrap:wrap}
-.sec-head h2{font-family:var(--display); font-weight:600; font-size:21px; letter-spacing:-.01em; margin:0}
+.sec-head h2{font-family:var(--display); font-weight:600; font-size:21px; letter-spacing:-.01em; margin:0; display:flex; align-items:center; gap:10px}
+.sec-head h2::before{content:""; width:3px; height:1.05em; border-radius:2px; background:linear-gradient(180deg, #FF9EA4, var(--red)); box-shadow:0 0 10px var(--red-glow); animation:barPulse 2.4s ease-in-out infinite}
 .sec-head p{margin:4px 0 0; color:var(--muted); font-size:13.5px}
-.chip{font-family:var(--mono); font-size:12px; color:var(--ink-2); padding:6px 12px; border-radius:999px; border:1px solid var(--line-2); background:var(--glass); font-variant-numeric:tabular-nums; white-space:nowrap}
+.chip{position:relative; overflow:hidden; display:inline-flex; align-items:center; gap:8px; font-family:var(--mono); font-size:12px; color:var(--ink-2); padding:6px 12px; border-radius:999px; border:1px solid var(--line-2); background:var(--glass); font-variant-numeric:tabular-nums; white-space:nowrap}
+.chip::before{content:""; width:6px; height:6px; border-radius:50%; background:var(--red); box-shadow:0 0 8px var(--red); animation:dotPulse 1.8s ease-in-out infinite}
+.chip::after{content:""; position:absolute; top:0; bottom:0; left:0; width:40%; background:linear-gradient(100deg, transparent, rgba(255,255,255,.14), transparent); animation:edgeRun 4.5s linear infinite}
+.sec.prev .chip::before{background:var(--blue); box-shadow:0 0 8px var(--blue)}
+.sec.prev .sec-head h2::before{background:linear-gradient(180deg, #C9D8FA, var(--blue)); box-shadow:0 0 10px var(--blue-glow)}
 
 /* ---------- KPI ---------- */
 .kpis{display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px}
-.kpi{position:relative; overflow:hidden; padding:22px 22px 20px; display:flex; flex-direction:column; gap:10px; transition:transform .35s ease, border-color .35s ease}
-.kpi:hover{transform:translateY(-3px); border-color:rgba(238,71,81,.35)}
-.kpi::before{ /* top reflection */
-  content:""; position:absolute; inset:0 0 auto 0; height:1px; background:linear-gradient(90deg, transparent, rgba(255,255,255,.35), transparent);
+.kpi{--acc:var(--red); --acc-soft:var(--red-soft); --acc-glow:var(--red-glow); --acc-ic:#FF8A91; --acc-grad:linear-gradient(90deg, #B8323B, var(--red) 40%, #FF9EA4 60%, var(--red) 80%, #B8323B);
+  position:relative; overflow:hidden; padding:22px 22px 20px; display:flex; flex-direction:column; gap:10px;
+  transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1), border-color .35s ease}
+.sec.prev .kpi{--acc:var(--blue); --acc-soft:var(--blue-soft); --acc-glow:var(--blue-glow); --acc-ic:#B4C8F5; --acc-grad:linear-gradient(90deg, #4A6AB8, var(--blue) 40%, #D6E1FB 60%, var(--blue) 80%, #4A6AB8)}
+.kpi:hover{transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) translateY(-3px); border-color:rgba(238,71,81,.35)}
+.sec.prev .kpi:hover{border-color:rgba(127,160,232,.4)}
+.kpi.tilting{transition:opacity .7s ease, transform .12s ease-out, border-color .35s ease}
+.kpi::before{ /* top reflection, flowing */
+  content:""; position:absolute; inset:0 0 auto 0; height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.4), transparent, rgba(255,255,255,.4), transparent);
+  background-size:200% 100%; animation:lineFlow 5s linear infinite;
 }
-.kpi-top{display:flex; justify-content:space-between; align-items:center; gap:10px}
+.kpi .spot{ /* spotlight that follows the pointer */
+  position:absolute; inset:0; border-radius:inherit; pointer-events:none; opacity:0; transition:opacity .3s ease;
+  background:radial-gradient(240px circle at var(--mx,50%) var(--my,50%), var(--acc-soft), transparent 70%)}
+.kpi:hover .spot{opacity:1}
+.kpi .shine{position:absolute; top:0; bottom:0; left:0; width:45%; pointer-events:none;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.07), transparent);
+  transform:translateX(-120%) skewX(-18deg); animation:shineSweep 6s ease-in-out infinite; animation-delay:var(--d,0s)}
+@keyframes shineSweep{0%{transform:translateX(-120%) skewX(-18deg)}35%,100%{transform:translateX(340%) skewX(-18deg)}}
+.kpi-top{display:flex; justify-content:space-between; align-items:center; gap:10px; position:relative}
 .kpi-label{font-size:12px; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-2)}
-.kpi-ic{width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--red-soft); border:1px solid rgba(238,71,81,.25)}
-.kpi-ic svg{width:17px; height:17px; color:#FF8A91}
+.kpi-ic{position:relative; width:34px; height:34px; border-radius:10px; display:grid; place-items:center; background:var(--acc-soft); border:1px solid rgba(238,71,81,.25)}
+.sec.prev .kpi-ic{border-color:rgba(127,160,232,.3)}
+.kpi-ic::after{content:""; position:absolute; inset:-1px; border-radius:10px; border:1.5px solid var(--acc); opacity:0; animation:iconRipple 2.8s ease-out infinite; animation-delay:var(--d,0s)}
+@keyframes iconRipple{0%{transform:scale(1); opacity:.5}70%,100%{transform:scale(1.6); opacity:0}}
+.kpi-ic svg{width:17px; height:17px; color:var(--acc-ic); overflow:visible}
+.kpi-row{display:flex; align-items:center; justify-content:space-between; gap:12px; position:relative}
 .kpi-val{font-family:var(--display); font-weight:600; font-size:40px; letter-spacing:-.03em; line-height:1; font-variant-numeric:tabular-nums}
 .kpi-val sup{font-size:.45em; font-weight:500; color:var(--ink-2); margin-left:2px; vertical-align:.9em}
-.kpi-sub{color:var(--muted); font-size:13px}
+.sec.prev .kpi-val{color:#DDE3EE}
+.kpi-sub{color:var(--muted); font-size:13px; position:relative}
 .kpi-sub b{color:var(--ink-2); font-weight:600}
-.bar{height:6px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden}
-.bar i{display:block; height:100%; width:0; border-radius:inherit; background:linear-gradient(90deg, #B8323B, var(--red) 70%, #FF9EA4); box-shadow:0 0 12px var(--red-glow); transition:width 1.4s cubic-bezier(.2,.8,.2,1)}
+.bar{height:6px; border-radius:99px; background:rgba(255,255,255,.07); overflow:hidden; position:relative}
+.bar i{display:block; height:100%; width:0; border-radius:inherit; background:var(--acc-grad); background-size:200% 100%; box-shadow:0 0 12px var(--acc-glow);
+  transition:width 1.4s cubic-bezier(.2,.8,.2,1); animation:lineFlow 2.6s linear infinite}
 .kpi.feature{background:linear-gradient(160deg, rgba(238,71,81,.16), rgba(255,255,255,.02) 60%)}
-.kpi.feature::after{content:""; position:absolute; right:-60px; bottom:-60px; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle, rgba(238,71,81,.25), transparent 70%); pointer-events:none}
+.kpi.feature::after{content:""; position:absolute; right:-60px; bottom:-60px; width:180px; height:180px; border-radius:50%; background:radial-gradient(circle, rgba(238,71,81,.25), transparent 70%); pointer-events:none; animation:featPulse 4s ease-in-out infinite}
+@keyframes featPulse{0%,100%{transform:scale(1); opacity:.8}50%{transform:scale(1.35); opacity:1}}
+
+/* live ring gauge on the percentage cards */
+.ring{width:48px; height:48px; flex:none; overflow:visible}
+.ring circle{fill:none}
+.ring .trk{stroke:rgba(255,255,255,.08); stroke-width:5}
+.ring .fil{stroke:var(--acc); stroke-width:5; stroke-linecap:round; stroke-dasharray:var(--c); stroke-dashoffset:var(--c);
+  filter:drop-shadow(0 0 4px var(--acc-glow)); transition:stroke-dashoffset 1.6s cubic-bezier(.2,.8,.2,1) .2s}
+.kpi.in .ring .fil{stroke-dashoffset:var(--off)}
+.ring .orb-dot{transform-origin:26px 26px; animation:spin 7s linear infinite}
+.ring .orb-dot circle{fill:var(--acc-ic)}
+
+/* each icon has its own motion */
+.an-ring svg{animation:icoRing 2.6s ease-in-out infinite; transform-origin:50% 60%}
+.an-draw .dr{stroke-dasharray:1; animation:icoDraw 2.6s ease-in-out infinite}
+.an-pie svg{animation:spin 6s linear infinite}
+.an-spinrev svg{animation:spin 3.6s linear infinite reverse}
+.an-target svg circle:nth-child(1){transform-box:fill-box; transform-origin:center; animation:tgt 2.2s ease-in-out infinite}
+.an-target svg circle:nth-child(2){transform-box:fill-box; transform-origin:center; animation:tgt 2.2s ease-in-out .25s infinite}
+.an-bars .bz{transform-box:fill-box; transform-origin:50% 100%; animation:icoBar 1.6s ease-in-out infinite}
+.an-bars .bz:nth-child(2){animation-delay:.2s}
+.an-bars .bz:nth-child(3){animation-delay:.4s}
+.an-pop svg{animation:icoPop 2.6s ease-in-out infinite}
+@keyframes icoRing{0%,40%,100%{transform:rotate(0)}5%{transform:rotate(-16deg)}10%{transform:rotate(14deg)}15%{transform:rotate(-12deg)}20%{transform:rotate(10deg)}25%{transform:rotate(-6deg)}30%{transform:rotate(4deg)}}
+@keyframes icoDraw{0%{stroke-dashoffset:1}45%,80%{stroke-dashoffset:0; opacity:1}100%{stroke-dashoffset:0; opacity:.25}}
+@keyframes tgt{0%,100%{transform:scale(1); opacity:1}50%{transform:scale(1.14); opacity:.6}}
+@keyframes icoBar{0%,100%{transform:scaleY(1)}50%{transform:scaleY(.45)}}
+@keyframes icoPop{0%,60%,100%{transform:scale(1)}75%{transform:scale(1.25) rotate(-6deg)}88%{transform:scale(.95)}}
 
 /* ---------- insights ---------- */
 .insights{display:grid; grid-template-columns:repeat(6, minmax(0,1fr)); gap:16px}
-.ins{grid-column:span 2; padding:22px; display:flex; flex-direction:column; gap:12px}
+.ins{grid-column:span 2; padding:22px; display:flex; flex-direction:column; gap:12px; position:relative; overflow:hidden;
+  transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1), border-color .35s ease}
+.ins:hover{transform:translateY(-3px); border-color:rgba(238,71,81,.35)}
+.ins::before{content:""; position:absolute; left:0; top:0; height:2px; width:35%; background:linear-gradient(90deg, transparent, var(--red), #FFE4E6, transparent); opacity:.7; animation:edgeRun 6s linear infinite; animation-delay:var(--d,0s)}
+.ins .side{position:absolute; left:0; top:18%; bottom:18%; width:3px; border-radius:0 3px 3px 0; background:linear-gradient(180deg, #FF9EA4, var(--red)); box-shadow:0 0 10px var(--red-glow);
+  transform:scaleY(0); transform-origin:top; transition:transform .8s cubic-bezier(.2,.8,.2,1) .35s}
+.ins.in .side{transform:scaleY(1)}
 .ins.wide{grid-column:span 3}
 .ins-top{display:flex; align-items:center; gap:12px}
-.ins-ic{width:38px; height:38px; flex:none; border-radius:12px; display:grid; place-items:center; background:linear-gradient(180deg, rgba(238,71,81,.22), rgba(238,71,81,.08)); border:1px solid rgba(238,71,81,.3)}
-.ins-ic svg{width:18px; height:18px; color:#FFB3B8}
+.ins-ic{position:relative; width:38px; height:38px; flex:none; border-radius:12px; display:grid; place-items:center; background:linear-gradient(180deg, rgba(238,71,81,.22), rgba(238,71,81,.08)); border:1px solid rgba(238,71,81,.3)}
+.ins-ic::after{content:""; position:absolute; inset:-1px; border-radius:12px; border:1.5px solid var(--red); opacity:0; animation:iconRipple 3s ease-out infinite; animation-delay:var(--d,0s)}
+.ins-ic svg{width:18px; height:18px; color:#FFB3B8; overflow:visible}
 .ins h3{font-family:var(--display); font-size:16px; font-weight:600; margin:0; letter-spacing:-.005em; line-height:1.3}
 .ins p{margin:0; color:var(--ink-2); font-size:14px; max-width:62ch}
-.ins .tag{margin-top:auto; align-self:flex-start; font-family:var(--mono); font-size:11.5px; color:#FFD3D6; padding:5px 10px; border-radius:8px; background:var(--red-soft); border:1px solid rgba(238,71,81,.25); font-variant-numeric:tabular-nums}
+.ins .tag{margin-top:auto; align-self:flex-start; display:inline-flex; align-items:center; gap:7px; font-family:var(--mono); font-size:11.5px; color:#FFD3D6; padding:5px 10px; border-radius:8px; background:var(--red-soft); border:1px solid rgba(238,71,81,.25); font-variant-numeric:tabular-nums}
+.ins .tag::before{content:""; width:5px; height:5px; border-radius:50%; background:var(--red); box-shadow:0 0 8px var(--red); animation:dotPulse 1.8s ease-in-out infinite; animation-delay:var(--d,0s)}
 
-.foot{display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:12.5px; padding-top:8px; border-top:1px solid var(--line)}
+.foot{position:relative; overflow:hidden; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:12.5px; padding-top:8px; border-top:1px solid var(--line)}
+.foot::before{content:""; position:absolute; left:0; top:0; height:1px; width:40%; background:linear-gradient(90deg, transparent, var(--red), transparent); animation:edgeRun 7s linear infinite}
 .btn{font:600 12.5px var(--body); letter-spacing:.06em; color:var(--ink-2); background:var(--glass); border:1px solid var(--line-2); border-radius:999px; padding:8px 14px; cursor:pointer; display:inline-flex; gap:8px; align-items:center}
 .btn:hover{color:var(--ink); border-color:rgba(238,71,81,.45)}
 .btn:focus-visible{outline:2px solid var(--red); outline-offset:2px}
-.btn svg{width:14px; height:14px}
+.btn svg{width:14px; height:14px; animation:spin 6s linear infinite reverse}
+.btn:hover svg{animation-duration:1.2s}
 
-/* reveal after intro (visible at rest by default) */
+/* reveal as each block scrolls into view (visible at rest if scripts are off) */
 .rv{transition:opacity .7s ease, transform .7s cubic-bezier(.2,.8,.2,1)}
-body.pre .rv{opacity:0; transform:translateY(14px)}
+body.live .rv:not(.in), body.live .kpi:not(.in), body.live .ins:not(.in){opacity:0; transform:translateY(14px)}
 
 /* ---------- INTRO ---------- */
 #intro{position:fixed; inset:0; z-index:50; display:grid; place-items:center; overflow:hidden;
@@ -150,8 +255,10 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
   background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); mix-blend-mode:overlay; opacity:0}
 .i-tag{position:absolute; left:0; right:0; top:92%; text-align:center; font-family:var(--body); font-size:clamp(10px, 1.8vw, 12px); font-weight:600; letter-spacing:.42em; text-transform:uppercase; color:var(--ink-2); opacity:0}
 .reflect{position:absolute; left:15%; right:15%; top:84%; height:40px; background:radial-gradient(ellipse at 50% 0%, rgba(238,71,81,.28), transparent 70%); filter:blur(6px); opacity:0}
+.i-skip{position:absolute; right:28px; bottom:26px; font:600 12px var(--body); letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.4); background:none; border:1px solid rgba(255,255,255,.14); border-radius:999px; padding:7px 14px; cursor:pointer; opacity:0; transition:color .2s, border-color .2s}
+.i-skip:hover{color:#fff; border-color:rgba(238,71,81,.6)}
 
-#intro.play .bright{animation:bright 1s ease 1s forwards}
+#intro.play .bright{animation:bright 1s ease 1s forwards, breathe 2.4s ease-in-out 2s infinite}
 #intro.play .main, #intro.play .glow{animation:draw 1s cubic-bezier(.65,.05,.36,1) forwards}
 #intro.play .pulse{animation:pulse 1s ease-in-out 1s forwards}
 #intro.play .house{animation:dim .8s ease 2.1s forwards}
@@ -159,9 +266,11 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
 #intro.play .sweep{animation:sweep .9s ease-in-out 3.05s forwards}
 #intro.play .i-tag{animation:fade .7s ease 3.2s forwards}
 #intro.play .reflect{animation:fade 1s ease 1.2s forwards}
+#intro.play .i-skip{animation:fade .5s ease 1.2s forwards}
 @keyframes draw{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
 @keyframes pulse{0%{opacity:0; stroke-dashoffset:.12}15%{opacity:1}85%{opacity:1}100%{opacity:0; stroke-dashoffset:-1}}
 @keyframes bright{to{opacity:1}}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
 @keyframes dim{to{opacity:.42}}
 @keyframes pop{0%{opacity:0; transform:translate(-50%,-50%) scale(.8); filter:blur(6px)}60%{opacity:1; filter:blur(0)}100%{opacity:1; transform:translate(-50%,-50%) scale(1)}}
 @keyframes sweep{0%{left:-60%; opacity:1}100%{left:130%; opacity:1}}
@@ -180,20 +289,25 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
   .ins:last-child{grid-column:auto}
   .kpi-val{font-size:34px}
 }
+/* Reduced motion: the intro still appears, already drawn and standing still.
+   Clicking "Replay intro" (html.motion-ok) plays the full animation on request. */
 @media (prefers-reduced-motion: reduce){
-  #intro{display:none}
-  .rv, .bar i, .kpi{transition:none}
+  html:not(.motion-ok) *, html:not(.motion-ok) *::before, html:not(.motion-ok) *::after{
+    animation-duration:.01ms !important; animation-delay:0s !important; animation-iteration-count:1 !important;
+    transition-duration:.01ms !important; transition-delay:0s !important;
+  }
+  html:not(.motion-ok) #intro{transition-duration:.6s !important}
+  .orb, .kpi .shine{display:none}
 }
 </style>
 </head>
 <body>
 
-
 <!-- ============ INTRO ============ -->
-<div id="intro" aria-hidden="true">
-  <div class="bright"></div>
-  <canvas id="fx"></canvas>
-  <div class="stage">
+<div id="intro">
+  <div class="bright" aria-hidden="true"></div>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="stage" aria-hidden="true">
     <svg class="house" id="houseSvg" viewBox="0 0 600 400">
       <defs>
         <linearGradient id="hg" x1="0" x2="1" y1="0" y2="0">
@@ -214,7 +328,13 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
     </div>
     <div class="i-tag">Weekly Campaign Performance</div>
   </div>
+  <button class="i-skip" id="skip" type="button">Skip</button>
 </div>
+
+<!-- ============ LIVE BACKGROUND ============ -->
+<canvas id="bg" aria-hidden="true"></canvas>
+<div class="orb a" aria-hidden="true"></div>
+<div class="orb b" aria-hidden="true"></div>
 
 <!-- ============ DASHBOARD ============ -->
 <div class="wrap">
@@ -222,7 +342,7 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
   <header class="glass header rv">
     <div>
       <div class="brand">
-        <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#EE4751" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"><path d="M22 12 H56 A26 26 0 0 1 56 64 H46"/><path d="M22 12 V72 L46 88 V26 Z"/></g></svg>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><g fill="none" stroke="#EE4751" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"><path pathLength="1" d="M22 12 H56 A26 26 0 0 1 56 64 H46"/><path pathLength="1" d="M22 12 V72 L46 88 V26 Z"/></g></svg>
         <div class="brand-name"><b>PROFESSIONALS</b><span>PROPERTY PLUS</span></div>
       </div>
       <h1 class="h1">Weekly Campaign Performance Report</h1>
@@ -235,80 +355,33 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
     <div class="tr">
       <div class="label"><i></i>Client Report</div>
       <div class="range"><small>Reporting week</small><span id="weekRange">—</span></div>
+      <div class="clock"><i aria-hidden="true"></i><span id="clock">—</span></div>
     </div>
   </header>
 
-  <section class="rv" style="display:flex; flex-direction:column; gap:16px" aria-labelledby="kpiH">
-    <div class="sec-head">
+  <!-- Current week: the cards are built from CURRENT_WEEK in the script below -->
+  <section class="sec" aria-labelledby="kpiH">
+    <div class="sec-head rv">
       <div><h2 id="kpiH">Current Week Performance</h2><p>Outbound calling results for the reporting week</p></div>
       <span class="chip" id="weekChip">—</span>
     </div>
-    <div class="kpis">
-      <article class="glass kpi feature">
-        <div class="kpi-top"><span class="kpi-label">Total Calls Taken</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3.5l1.8 4.4-2.2 1.4a11 11 0 0 0 6.1 6.1l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/></svg></span></div>
-        <div class="kpi-val" data-count="953" data-dec="0">0</div>
-        <div class="kpi-sub">Dials completed across the campaign</div>
-      </article>
-      <article class="glass kpi">
-        <div class="kpi-top"><span class="kpi-label">Calls Connected</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h5l2-4 2 8 2-4h5"/></svg></span></div>
-        <div class="kpi-val" data-count="415" data-dec="0">0</div>
-        <div class="kpi-sub"><b>415</b> live conversations with prospects</div>
-      </article>
-      <article class="glass kpi">
-        <div class="kpi-top"><span class="kpi-label">Connected Calls %</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 7.6 10.5L12 12z"/></svg></span></div>
-        <div class="kpi-val" data-count="43.55" data-dec="2" data-suf="%">0</div>
-        <div class="bar"><i data-w="43.55"></i></div>
-        <div class="kpi-sub"><b>415</b> of 953 calls connected</div>
-      </article>
-      <article class="glass kpi">
-        <div class="kpi-top"><span class="kpi-label">Total Callbacks</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/></svg></span></div>
-        <div class="kpi-val" data-count="3" data-dec="0">0</div>
-        <div class="kpi-sub">Prospects who asked to be called back</div>
-      </article>
-      <article class="glass kpi">
-        <div class="kpi-top"><span class="kpi-label">Appointments Set</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg></span></div>
-        <div class="kpi-val" data-count="3" data-dec="0">0</div>
-        <div class="kpi-sub">Confirmed meetings for the team</div>
-      </article>
-      <article class="glass kpi">
-        <div class="kpi-top"><span class="kpi-label">Appointment %</span><span class="kpi-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg></span></div>
-        <div class="kpi-val" data-count="0.72" data-dec="2" data-suf="%">0</div>
-        <div class="kpi-sub"><b>3</b> appointments from 415 connected calls</div>
-      </article>
-    </div>
+    <div class="kpis" id="curKpis"></div>
   </section>
 
-  <section class="rv" style="display:flex; flex-direction:column; gap:16px" aria-labelledby="insH">
-    <div class="sec-head">
+  <!-- Previous month: the cards are built from PREVIOUS_MONTH in the script below -->
+  <section class="sec prev" aria-labelledby="prevH">
+    <div class="sec-head rv">
+      <div><h2 id="prevH">Previous Month Performance</h2><p id="prevP">Outbound calling results for the previous month</p></div>
+      <span class="chip" id="prevChip">—</span>
+    </div>
+    <div class="kpis" id="prevKpis"></div>
+  </section>
+
+  <section class="sec" aria-labelledby="insH">
+    <div class="sec-head rv">
       <div><h2 id="insH">Campaign Performance Insights</h2><p>Prepared for management and client review</p></div>
     </div>
-    <div class="insights">
-      <article class="glass ins wide">
-        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V11M10 19V6M16 19v-9M22 19H2"/></svg></span><h3>Consistent, high-volume outreach</h3></div>
-        <p>The team completed 953 calls this week, keeping a steady and disciplined calling rhythm from Monday to Friday. This level of activity keeps Professionals Property Plus visible to a wide base of homeowners and prospects.</p>
-        <span class="tag">953 calls</span>
-      </article>
-      <article class="glass ins wide">
-        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16v10H8l-4 4z"/><path d="M8 10h8M8 13h5"/></svg></span><h3>Strong connection rate</h3></div>
-        <p>More than four in every ten calls reached a live person. 415 real conversations give the campaign a healthy base of engaged contacts and useful market feedback to build on.</p>
-        <span class="tag">43.55% connected</span>
-      </article>
-      <article class="glass ins">
-        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4M9 15l2 2 4-4"/></svg></span><h3>Appointments secured</h3></div>
-        <p>Three appointments were confirmed this week. Each one is a direct opportunity for the Professionals team to meet a motivated prospect in person.</p>
-        <span class="tag">3 appointments</span>
-      </article>
-      <article class="glass ins">
-        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4M12 8v4l3 2"/></svg></span><h3>A warm pipeline is forming</h3></div>
-        <p>Three prospects asked to be called back. These contacts have already shown interest, which sets up promising follow-up conversations next week.</p>
-        <span class="tag">3 callbacks</span>
-      </article>
-      <article class="glass ins">
-        <div class="ins-top"><span class="ins-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg></span><h3>Growing brand presence</h3></div>
-        <p>Every conversation introduces the brand to local homeowners. The insights gathered this week will guide calling times and list focus as the campaign continues.</p>
-        <span class="tag">415 conversations</span>
-      </article>
-    </div>
+    <div class="insights" id="insights"></div>
   </section>
 
   <footer class="foot rv">
@@ -319,46 +392,281 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
 
 <script>
 (function(){
-  /* ---------- live dates ---------- */
+  /* =====================================================================
+     EDIT YOUR NUMBERS HERE
+     Type plain whole numbers only: no "%" signs, no commas, no quotes.
+     The percentages, the bars, the small text under each card and the
+     numbers inside the insights are all worked out from these.
+     ===================================================================== */
+  const CURRENT_WEEK = {
+    calls: 471,          // Total Calls Taken
+    connected: 142,      // Calls Connected
+    callbacks: 1,        // Total Callbacks
+    appointments: 3      // Appointments Set
+  };
+  const PREVIOUS_WEEK = {
+    calls: 953,
+    connected: 415,
+    callbacks: 3,
+    appointments: 3
+  };
+  /* The second section is labelled "Previous Week" and dated with last week's name.
+     Change this to 'month' to label and date it as the previous month instead. */
+  const PREVIOUS_PERIOD = 'week';
+  /* ===================================================================== */
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const html = document.documentElement;
+  const $ = id => document.getElementById(id);
+  const clamp01 = v => Math.max(0, Math.min(1, v));
+
+  /* ---------- data ---------- */
+  function clean(src, name){
+    const out = {};
+    ['calls','connected','callbacks','appointments'].forEach(k => {
+      const v = Number(src[k]);
+      if (!Number.isFinite(v)) console.warn(name + '.' + k + ' is not a number; shown as 0');
+      out[k] = Number.isFinite(v) ? v : 0;
+    });
+    out.connPct = out.calls > 0 ? out.connected / out.calls * 100 : 0;
+    out.apptPct = out.connected > 0 ? out.appointments / out.connected * 100 : 0;
+    return out;
+  }
+  const cur = clean(CURRENT_WEEK, 'CURRENT_WEEK');
+  const prev = clean(PREVIOUS_WEEK, 'PREVIOUS_WEEK');
+  const num = (v, dec) => v.toLocaleString('en-AU', {minimumFractionDigits:dec || 0, maximumFractionDigits:dec || 0});
+  const WORDS = ['no','one','two','three','four','five','six','seven','eight','nine','ten'];
+  const word = n => (Number.isInteger(n) && n >= 0 && n <= 10) ? WORDS[n] : num(n);
+  const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+  const plural = (n, one, many) => n === 1 ? one : many;
+
+  /* ---------- live dates and clock ---------- */
   const now = new Date();
-  const full = now.toLocaleDateString('en-AU', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
   const mon = new Date(now); mon.setDate(now.getDate() - ((now.getDay() + 6) % 7));
   const fri = new Date(mon); fri.setDate(mon.getDate() + 4);
   const f = d => d.toLocaleDateString('en-AU', {weekday:'short', day:'numeric', month:'short'});
   const range = f(mon) + ' – ' + f(fri) + ' ' + fri.getFullYear();
-  document.getElementById('today').textContent = full;
-  document.getElementById('weekRange').textContent = range;
-  document.getElementById('weekChip').textContent = range;
-  document.getElementById('footRange').textContent = range;
+  $('weekRange').textContent = range;
+  $('weekChip').textContent = range;
+  $('footRange').textContent = range;
+  if (PREVIOUS_PERIOD === 'week'){
+    const pm = new Date(mon); pm.setDate(mon.getDate() - 7);
+    const pf = new Date(pm); pf.setDate(pm.getDate() + 4);
+    $('prevH').textContent = 'Previous Week Performance';
+    $('prevP').textContent = 'Outbound calling results for the previous week';
+    $('prevChip').textContent = f(pm) + ' – ' + f(pf) + ' ' + pf.getFullYear();
+  } else {
+    $('prevChip').textContent = new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString('en-AU', {month:'long', year:'numeric'});
+  }
+  function tick(){
+    const t = new Date();
+    $('today').textContent = t.toLocaleDateString('en-AU', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    $('clock').textContent = t.toLocaleTimeString('en-AU', {hour:'numeric', minute:'2-digit', second:'2-digit'});
+  }
+  tick(); setInterval(tick, 1000);
 
-  /* ---------- KPI count-up ---------- */
-  function countUp(){
-    document.querySelectorAll('[data-count]').forEach(el => {
-      const target = parseFloat(el.dataset.count), dec = +el.dataset.dec, suf = el.dataset.suf || '';
-      const t0 = performance.now(), dur = 1300;
-      const fmt = v => v.toLocaleString('en-AU', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + (suf ? '<sup>' + suf + '</sup>' : '');
-      (function step(t){
-        const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
-        el.innerHTML = fmt(target * e);
-        if (p < 1) requestAnimationFrame(step);
-      })(t0);
+  /* ---------- KPI cards ---------- */
+  const SVG = inner => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+  const KPIS = [
+    { key:'calls', label:'Total Calls Taken', an:'ring',
+      icon:SVG('<path d="M5 4h3.5l1.8 4.4-2.2 1.4a11 11 0 0 0 6.1 6.1l1.4-2.2L20 15.5V19a1.5 1.5 0 0 1-1.6 1.5A16 16 0 0 1 3.5 5.6 1.5 1.5 0 0 1 5 4z"/>'),
+      sub:() => 'Dials completed across the campaign' },
+    { key:'connected', label:'Calls Connected', an:'draw',
+      icon:SVG('<path class="dr" pathLength="1" d="M4 12h5l2-4 2 8 2-4h5"/>'),
+      sub:d => '<b>' + num(d.connected) + '</b> live ' + plural(d.connected, 'conversation', 'conversations') + ' with prospects' },
+    { key:'connPct', label:'Connected Calls %', an:'pie', pct:true, bar:true,
+      icon:SVG('<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 7.6 10.5L12 12z"/>'),
+      sub:d => '<b>' + num(d.connected) + '</b> of ' + num(d.calls) + ' calls connected' },
+    { key:'callbacks', label:'Total Callbacks', an:'spinrev',
+      icon:SVG('<path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4"/>'),
+      sub:() => 'Prospects who asked to be called back' },
+    { key:'appointments', label:'Appointments Set', an:'draw',
+      icon:SVG('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path class="dr" pathLength="1" d="M9 15l2 2 4-4"/>'),
+      sub:() => 'Confirmed meetings for the team' },
+    { key:'apptPct', label:'Appointment %', an:'target', pct:true,
+      icon:SVG('<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".8" fill="currentColor"/>'),
+      sub:d => '<b>' + num(d.appointments) + '</b> ' + plural(d.appointments, 'appointment', 'appointments') + ' from ' + num(d.connected) + ' connected calls' }
+  ];
+  const RING_C = 2 * Math.PI * 21;
+
+  function buildKpis(gridId, d, feature){
+    const grid = $(gridId);
+    KPIS.forEach((k, i) => {
+      const v = d[k.key];
+      const card = document.createElement('article');
+      card.className = 'glass kpi' + (feature && i === 0 ? ' feature' : '');
+      card.dataset.delay = (i * 0.08) + 's';
+      card.style.setProperty('--d', (i * 0.45) + 's');
+      const ring = k.pct ?
+        '<svg class="ring" viewBox="0 0 52 52" aria-hidden="true"><circle class="trk" cx="26" cy="26" r="21"/>' +
+        '<circle class="fil" cx="26" cy="26" r="21" transform="rotate(-90 26 26)" style="--c:' + RING_C.toFixed(2) + ';--off:' + (RING_C * (1 - clamp01(v / 100))).toFixed(2) + '"/>' +
+        '<g class="orb-dot"><circle cx="26" cy="5" r="2.2"/></g></svg>' : '';
+      card.innerHTML =
+        '<span class="spot" aria-hidden="true"></span><span class="shine" aria-hidden="true"></span>' +
+        '<div class="kpi-top"><span class="kpi-label">' + k.label + '</span><span class="kpi-ic an-' + k.an + '">' + k.icon + '</span></div>' +
+        '<div class="kpi-row"><div class="kpi-val" data-count="' + v + '" data-dec="' + (k.pct ? 2 : 0) + '"' + (k.pct ? ' data-suf="%"' : '') + '>0</div>' + ring + '</div>' +
+        (k.bar ? '<div class="bar"><i data-w="' + clamp01(v / 100) * 100 + '"></i></div>' : '') +
+        '<div class="kpi-sub">' + k.sub(d) + '</div>';
+      attachTilt(card);
+      grid.appendChild(card);
     });
-    document.querySelectorAll('.bar i').forEach(b => { b.style.width = '0'; requestAnimationFrame(() => requestAnimationFrame(() => b.style.width = b.dataset.w + '%')); });
   }
-  function finalValues(){
-    document.querySelectorAll('[data-count]').forEach(el => {
-      const dec = +el.dataset.dec, suf = el.dataset.suf || '';
-      el.innerHTML = parseFloat(el.dataset.count).toLocaleString('en-AU', {minimumFractionDigits:dec, maximumFractionDigits:dec}) + (suf ? '<sup>' + suf + '</sup>' : '');
+
+  /* cards lean toward the pointer and a soft spotlight follows it */
+  function attachTilt(card){
+    if (reduce || !window.matchMedia('(hover: hover)').matches) return;
+    card.addEventListener('pointermove', e => {
+      const r = card.getBoundingClientRect();
+      const x = clamp01((e.clientX - r.left) / r.width), y = clamp01((e.clientY - r.top) / r.height);
+      card.style.setProperty('--ry', ((x - .5) * 8).toFixed(2) + 'deg');
+      card.style.setProperty('--rx', ((.5 - y) * 8).toFixed(2) + 'deg');
+      card.style.setProperty('--mx', (x * 100).toFixed(1) + '%');
+      card.style.setProperty('--my', (y * 100).toFixed(1) + '%');
+      card.classList.add('tilting');
     });
-    document.querySelectorAll('.bar i').forEach(b => b.style.width = b.dataset.w + '%');
+    card.addEventListener('pointerleave', () => {
+      card.classList.remove('tilting');
+      card.style.setProperty('--rx', '0deg'); card.style.setProperty('--ry', '0deg');
+    });
   }
+
+  buildKpis('curKpis', cur, true);
+  buildKpis('prevKpis', prev, false);
+
+  /* ---------- insights (the numbers in the wording follow CURRENT_WEEK) ---------- */
+  function shareOfTen(p){
+    const n = Math.floor(p / 10), rest = p - n * 10;
+    if (n >= 10) return 'Every call';
+    if (n < 1) return 'Fewer than one in every ten calls';
+    return (rest >= 0.5 ? 'More than ' : 'About ') + WORDS[n] + ' in every ten calls';
+  }
+  const a = cur.appointments, cb = cur.callbacks;
+  const INSIGHTS = [
+    { wide:true, an:'bars', title:'Consistent, high-volume outreach',
+      icon:SVG('<path class="bz" d="M4 19V11"/><path class="bz" d="M10 19V6"/><path class="bz" d="M16 19v-9"/><path d="M22 19H2"/>'),
+      text:'The team completed ' + num(cur.calls) + ' calls this week, keeping a steady and disciplined calling rhythm from Monday to Friday. This level of activity keeps Professionals Property Plus visible to a wide base of homeowners and prospects.',
+      tag:num(cur.calls) + ' calls' },
+    { wide:true, an:'draw', title:'Strong connection rate',
+      icon:SVG('<path d="M4 6h16v10H8l-4 4z"/><path class="dr" pathLength="1" d="M8 10h8M8 13h5"/>'),
+      text:shareOfTen(cur.connPct) + ' reached a live person. ' + num(cur.connected) + ' real conversations give the campaign a healthy base of engaged contacts and useful market feedback to build on.',
+      tag:num(cur.connPct, 2) + '% connected' },
+    { an:'draw', title:'Appointments secured',
+      icon:SVG('<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path class="dr" pathLength="1" d="M9 15l2 2 4-4"/>'),
+      text:cap(word(a)) + ' ' + plural(a, 'appointment was', 'appointments were') + ' confirmed this week.' +
+        (a > 0 ? ' Each one is a direct opportunity for the Professionals team to meet a motivated prospect in person.' : ' The conversations held this week keep the door open for meetings in the weeks ahead.'),
+      tag:num(a) + ' ' + plural(a, 'appointment', 'appointments') },
+    { an:'spinrev', title:'A warm pipeline is forming',
+      icon:SVG('<path d="M4 12a8 8 0 1 0 2.3-5.7"/><path d="M4 4v4h4M12 8v4l3 2"/>'),
+      text:cap(word(cb)) + ' ' + plural(cb, 'prospect', 'prospects') + ' asked to be called back.' +
+        (cb > 0 ? ' These contacts have already shown interest, which sets up promising follow-up conversations next week.' : ''),
+      tag:num(cb) + ' ' + plural(cb, 'callback', 'callbacks') },
+    { an:'pop', title:'Growing brand presence',
+      icon:SVG('<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-5h4v5"/>'),
+      text:'Every conversation introduces the brand to local homeowners. The insights gathered this week will guide calling times and list focus as the campaign continues.',
+      tag:num(cur.connected) + ' ' + plural(cur.connected, 'conversation', 'conversations') }
+  ];
+  INSIGHTS.forEach((s, i) => {
+    const el = document.createElement('article');
+    el.className = 'glass ins' + (s.wide ? ' wide' : '');
+    el.dataset.delay = (i * 0.08) + 's';
+    el.style.setProperty('--d', (i * 0.6) + 's');
+    el.innerHTML = '<span class="side" aria-hidden="true"></span>' +
+      '<div class="ins-top"><span class="ins-ic an-' + s.an + '">' + s.icon + '</span><h3>' + s.title + '</h3></div>' +
+      '<p>' + s.text + '</p><span class="tag">' + s.tag + '</span>';
+    $('insights').appendChild(el);
+  });
+
+  /* ---------- count-up, bars, reveal ---------- */
+  const fmtVal = (el, v) => {
+    const dec = +el.dataset.dec, suf = el.dataset.suf || '';
+    el.innerHTML = num(v, dec) + (suf ? '<sup>' + suf + '</sup>' : '');
+  };
+  function countUp(el, delay){
+    const target = parseFloat(el.dataset.count);
+    if (reduce){ fmtVal(el, target); return; }
+    const dur = 1300; let t0 = null;
+    (function step(t){
+      if (t0 === null) t0 = t + delay;
+      const p = clamp01((t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+      fmtVal(el, target * e);
+      if (p < 1) requestAnimationFrame(step);
+    })(performance.now());
+  }
+  const targets = () => Array.from(document.querySelectorAll('.rv, .kpi, .ins'));
+  function reveal(el){
+    const delay = parseFloat(el.dataset.delay || '0') * 1000;
+    el.style.transitionDelay = (delay / 1000) + 's';
+    el.classList.add('in');
+    el.querySelectorAll('[data-count]').forEach(v => countUp(v, delay));
+    el.querySelectorAll('.bar i').forEach(b => setTimeout(() => { b.style.width = b.dataset.w + '%'; }, delay + 60));
+    setTimeout(() => { el.style.transitionDelay = '0s'; }, delay + 800);   // so hover responds at once afterwards
+  }
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting){ reveal(e.target); io.unobserve(e.target); } });
+  }, {threshold:.12});
+  function hideAll(){
+    targets().forEach(el => { io.unobserve(el); el.classList.remove('in'); });
+    document.querySelectorAll('[data-count]').forEach(v => fmtVal(v, 0));
+    document.querySelectorAll('.bar i').forEach(b => { b.style.width = '0'; });
+  }
+  let entered = false;
+  function enterDashboard(){
+    if (reduce){ if (!entered) targets().forEach(reveal); }
+    else targets().forEach(el => { if (!el.classList.contains('in')) io.observe(el); });
+    if (!entered){ entered = true; sizeBg(); if (reduce) drawBg(0); else requestAnimationFrame(bgLoop); }
+  }
+
+  /* ---------- live background: drifting network with signals ---------- */
+  const bg = $('bg'), bctx = bg.getContext('2d');
+  const net = {W:0, H:0, dpr:1, nodes:[], pulses:[], mx:-9999, my:-9999, last:0};
+  function sizeBg(){
+    net.dpr = Math.min(devicePixelRatio || 1, 2); net.W = innerWidth; net.H = innerHeight;
+    bg.width = Math.round(net.W * net.dpr); bg.height = Math.round(net.H * net.dpr);
+    const count = Math.max(22, Math.min(64, Math.round(net.W * net.H / 26000)));
+    while (net.nodes.length < count) net.nodes.push({x:Math.random()*net.W, y:Math.random()*net.H, vx:(Math.random()-.5)*.35, vy:(Math.random()-.5)*.35, r:1.2+Math.random()*2, ph:Math.random()*6.28, c:Math.random() < .5});
+    net.nodes.length = count; net.pulses = [];
+  }
+  function drawBg(time){
+    const W = net.W, H = net.H, nodes = net.nodes;
+    bctx.setTransform(net.dpr, 0, 0, net.dpr, 0, 0); bctx.clearRect(0, 0, W, H);
+    if (!reduce) nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > W){ n.vx *= -1; n.x = Math.max(0, Math.min(W, n.x)); }
+      if (n.y < 0 || n.y > H){ n.vy *= -1; n.y = Math.max(0, Math.min(H, n.y)); }
+    });
+    const LINK = 150, links = [];
+    bctx.lineWidth = 1; bctx.strokeStyle = '#9FB4E8';
+    for (let i = 0; i < nodes.length; i++) for (let j = i + 1; j < nodes.length; j++){
+      const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y, dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < LINK){ bctx.globalAlpha = (1 - dist / LINK) * .13; bctx.beginPath(); bctx.moveTo(nodes[i].x, nodes[i].y); bctx.lineTo(nodes[j].x, nodes[j].y); bctx.stroke(); links.push(i, j); }
+    }
+    bctx.strokeStyle = '#EE4751';
+    nodes.forEach(n => {
+      const dx = n.x - net.mx, dy = n.y - net.my, dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 190){ bctx.globalAlpha = (1 - dist / 190) * .35; bctx.beginPath(); bctx.moveTo(n.x, n.y); bctx.lineTo(net.mx, net.my); bctx.stroke(); }
+    });
+    if (!reduce){
+      if (time - net.last > 420 && links.length){ net.last = time; const k = Math.floor(Math.random() * (links.length / 2)) * 2; net.pulses.push({a:links[k], b:links[k+1], t:0}); }
+      net.pulses = net.pulses.filter(p => p.t < 1 && nodes[p.a] && nodes[p.b]);
+      bctx.fillStyle = '#FF8A91';
+      net.pulses.forEach(p => { p.t += .02; const A = nodes[p.a], B = nodes[p.b];
+        bctx.globalAlpha = Math.sin(Math.PI * clamp01(p.t)) * .75; bctx.beginPath(); bctx.arc(A.x + (B.x - A.x) * p.t, A.y + (B.y - A.y) * p.t, 2, 0, 7); bctx.fill(); });
+    }
+    nodes.forEach(n => {
+      bctx.globalAlpha = .28; bctx.fillStyle = n.c ? '#EE4751' : '#9FB4E8';
+      bctx.beginPath(); bctx.arc(n.x, n.y, Math.max(.5, n.r + (reduce ? 0 : Math.sin(time / 900 + n.ph) * .6)), 0, 7); bctx.fill();
+    });
+    bctx.globalAlpha = 1;
+  }
+  function bgLoop(t){ drawBg(t); requestAnimationFrame(bgLoop); }
+  addEventListener('pointermove', e => { net.mx = e.clientX; net.my = e.clientY; }, {passive:true});
+  document.documentElement.addEventListener('pointerleave', () => { net.mx = net.my = -9999; });
 
   /* ---------- intro ---------- */
-  const intro = document.getElementById('intro');
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const cvs = document.getElementById('fx'), ctx = cvs.getContext('2d');
-  const path = document.getElementById('housePath'), svg = document.getElementById('houseSvg');
-  let parts = [], raf = 0, timers = [];
+  const intro = $('intro');
+  const cvs = $('fx'), ctx = cvs.getContext('2d');
+  const path = $('housePath'), svg = $('houseSvg');
+  let parts = [], dust = [], raf = 0, timers = [];
 
   function size(){ const r = devicePixelRatio || 1; cvs.width = innerWidth * r; cvs.height = innerHeight * r; ctx.setTransform(r,0,0,r,0,0); }
   const ease = p => p < .5 ? 4*p*p*p : 1 - Math.pow(-2*p + 2, 3) / 2;
@@ -367,6 +675,14 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
     return function loop(t){
       const s = (t - t0) / 1000;
       ctx.clearRect(0, 0, innerWidth, innerHeight);
+      /* embers drifting up for the whole intro */
+      const fadeIn = clamp01(s / .8);
+      for (const d of dust){
+        d.y -= d.v; d.x += Math.sin(s * d.f + d.ph) * .25;
+        if (d.y < -6){ d.y = innerHeight + 6; d.x = Math.random() * innerWidth; }
+        ctx.fillStyle = d.w ? `rgba(255,255,255,${(.25 + .35 * Math.sin(s * 2 + d.ph)) * fadeIn})` : `rgba(255,110,118,${(.3 + .3 * Math.sin(s * 2 + d.ph)) * fadeIn})`;
+        ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 7); ctx.fill();
+      }
       if (s < 1.02){
         const len = path.getTotalLength();
         const pt = path.getPointAtLength(len * ease(Math.min(1, s)));
@@ -382,26 +698,53 @@ body.pre .rv{opacity:0; transform:translateY(14px)}
         ctx.fillStyle = p.w ? `rgba(255,255,255,${p.life*.9})` : `rgba(255,110,118,${p.life})`;
         ctx.beginPath(); ctx.arc(p.x, p.y, p.r * p.life, 0, 7); ctx.fill();
       }
-      if (s < 2.2) raf = requestAnimationFrame(loop); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+      if (s < 4.8) raf = requestAnimationFrame(loop); else ctx.clearRect(0, 0, innerWidth, innerHeight);
     };
   }
 
-  function play(){
+  /* fullMotion=false shows the intro already drawn and still (reduced-motion viewers) */
+  function play(fullMotion){
     cancelAnimationFrame(raf); timers.forEach(clearTimeout); timers = []; parts = [];
-    if (reduce){ finalValues(); return; }
-    document.body.classList.add('pre');
+    if (!reduce) hideAll();
     intro.classList.remove('done', 'play'); void intro.offsetWidth;
     size(); intro.classList.add('play');
-    raf = requestAnimationFrame(t => requestAnimationFrame(frame(t)));
-    timers.push(setTimeout(() => {
-      intro.classList.add('done');
-      document.body.classList.remove('pre');
-      countUp();
-    }, 4000));
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    if (fullMotion){
+      dust = [];
+      const n = Math.max(30, Math.min(90, Math.round(innerWidth * innerHeight / 16000)));
+      for (let i = 0; i < n; i++) dust.push({x:Math.random()*innerWidth, y:Math.random()*innerHeight, v:.15 + Math.random()*.55, r:.5 + Math.random()*1.3, f:.6 + Math.random(), ph:Math.random()*6.28, w:Math.random() < .4});
+      raf = requestAnimationFrame(t => requestAnimationFrame(frame(t)));
+    }
+    timers.push(setTimeout(finish, fullMotion ? 4000 : 2600));
   }
-  addEventListener('resize', size);
-  document.getElementById('replay').addEventListener('click', () => { scrollTo({top:0}); play(); });
-  play();
+  function finish(){
+    timers.forEach(clearTimeout); timers = [];
+    intro.classList.add('done');
+    enterDashboard();
+    timers.push(setTimeout(() => { html.classList.remove('motion-ok'); }, 700));
+  }
+  addEventListener('resize', () => { size(); sizeBg(); if (reduce && entered) drawBg(0); });
+  $('skip').addEventListener('click', finish);
+  /* an explicit click always plays the full intro */
+  $('replay').addEventListener('click', () => { scrollTo({top:0}); html.classList.add('motion-ok'); play(true); });
+
+  /* First play waits until the page is really on screen, so the intro is not missed
+     when the file opens in a background tab or a preview panel that is not showing yet. */
+  document.body.classList.add('live');
+  (function firstPlay(){
+    let done = false, watching = false;
+    function go(){ if (done) return; done = true; document.removeEventListener('visibilitychange', check); play(!reduce); }
+    function check(){
+      if (done || watching || document.visibilityState !== 'visible') return;
+      if (!('IntersectionObserver' in window)){ go(); return; }
+      watching = true;
+      const seen = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)){ seen.disconnect(); go(); } });
+      seen.observe(intro);
+      setTimeout(() => { seen.disconnect(); go(); }, 4000);   // failsafe so the page can never stay on the intro
+    }
+    document.addEventListener('visibilitychange', check);
+    check();
+  })();
 })();
 </script>
 
